@@ -92,7 +92,7 @@ app.post  ('/product', async (req, res) => {
         });
     }
 
-    // const id = Math.floor(Math.random() * 1000) + 1;
+    
 
     const newproduct = new product({
       image,
@@ -106,43 +106,150 @@ app.post  ('/product', async (req, res) => {
     res.json({
         success: true,
         data: saveproduct,
-        message: `successfully added new data. `,
+        message: `successfully added new product. `,
 
     });
 
 })
 
-app.get('/boy', async (req, res) => {
-    const { email } = req.query;
-    let boy = null;
+app.get('/product', async (req, res) => {
+    const { title } = req.query;
+   
 
-    const student = await student.findOne({email:email})
+    const products = await product.findOne({title:title});
 
-    students.forEach((stud) => {
-        if (stud.id == id) {
-            boy = stud;
-        }
-
-    })
-
-    if (boy == null) {
-
-        return res.json({
-            success: false,
-            message: `student not found `,
-        })
-    }
 
     res.json({
         success: true,
-        data: boy,
-        message: `successfully added new student. `,
+        data: products,
+        message: `successfully fatch  product. `,
     })
+});
 
+app.delete('/product/:_id', async (req, res) =>{
 
+    const {_id} = req.params;
+
+    await product.deleteOne({_id :_id});
+
+    const deletproduct = await product.deleteOne({_id: _id});
+
+    res.json({
+                success: true,
+                data : deletproduct,
+                message: `successfully delet  product ${_id} . `,
+            })
 
 })
 
+app.put('/product/:_id', async (req, res) =>{
+
+    const {_id} = req.params;
+    const {title, description, price, brand, image} = req.body;
+
+
+    if (!image) {
+
+        return res.json({
+            success: false,
+            message: `image is required `,
+
+        });
+    }
+
+    if (!title) {
+
+        return res.json({
+            success: false,
+            message: `title is required `,
+
+        });
+    }
+
+    if (!description) {
+
+        return res.json({
+            success: false,
+            message: `description is required `,
+
+        });
+    }
+
+    if (!price) {
+
+        return res.json({
+            success: false,
+            message: `price is required `,
+
+        });
+    }
+
+    if (!brand) {
+
+        return res.json({
+            success: false,
+            message: `brand is required `,
+
+        });
+    }
+
+    await product.updateOne({_id :_id}, {$set: {
+        title:title,
+         description: description, 
+         image: image, 
+         price: price, 
+         brand: brand 
+        
+    }}
+    );
+
+    const updatedproduct = await product.findOne({_id: _id});
+    res.json({
+                success: true,
+                data: updatedproduct,
+                message: `successfully put  product ${_id} . `,
+            })
+
+});
+
+app.patch('/product/:_id', async (req, res) =>{
+
+    const {_id} = req.params;
+    const {title, description, price, brand, image} = req.body;
+    const products = await product.findById(_id);
+
+
+    if(image){
+        products.image = image;
+    }
+
+    if(title && title!== product.title){
+        products.title = title;
+    }
+
+    if(description){
+        products.description =description;
+    }
+
+    if(price){
+        products.price=price;
+    }
+
+    if(brand){
+        products.brand = brand;
+    }
+
+    
+
+    const updatedproduct = await products.save ();
+
+    res.json({
+        success: true,
+        data: updatedproduct,
+        message: `successfully patch  product.`,
+    })
+
+});
 
 
 app.listen(PORT, ()=>{
