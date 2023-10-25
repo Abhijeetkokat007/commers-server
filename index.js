@@ -28,6 +28,7 @@ const productSchema = new Schema({
  description: String,
  price:String,
  brand:String,
+ 
 
  
 
@@ -112,11 +113,11 @@ app.post  ('/product', async (req, res) => {
 
 })
 
-app.get('/product', async (req, res) => {
-    const { title } = req.query;
+app.get('/product/:_id', async (req, res) => {
+    const {_id} = req.params;
    
-
-    const products = await product.findOne({title:title});
+    await product.findOne({_id :_id});
+    const products = await product.findOne({_id: _id});
 
 
     res.json({
